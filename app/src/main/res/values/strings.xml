@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">News Reader</string>
-<string-array name="News_source">
-    <item>BBC News</item>
-    <item>CNN</item>
-    <item>The Hindu</item>
-    <item>The New York Times</item>
-    <item>The Telegraph</item>
-    <item>The Times of India</item>
-    <item>Time</item>
-</string-array>
+    <string-array name="News_source">
+        <item>BBC News</item>
+        <item>CNN</item>
+        <item>The Hindu</item>
+        <item>The New York Times</item>
+        <item>The Telegraph</item>
+        <item>The Times of India</item>
+        <item>Time</item>
+    </string-array>
 
 </resources>

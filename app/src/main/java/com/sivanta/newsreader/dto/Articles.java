@@ -8,16 +8,20 @@ public class Articles
 {
     private String title;
     private String description;
+    private String disUrl;
+    private String urlToImage;
+    private String publishedAt;
 
-    public Articles(String title, String urlToImage,String description) {
+
+    public Articles(String title, String urlToImage,String description,String disUrl) {
         this.title = title;
         this.urlToImage = urlToImage;
         this.description=description;
+       // this.publishedAt=publishedAt;
+        this.disUrl=disUrl;
     }
 
-    private String url;
-    private String urlToImage;
-    private String publishedAt;
+
 
     public String getTitle() {
         return title;
@@ -35,12 +39,12 @@ public class Articles
         this.description = description;
     }
 
-    public String getUrl() {
-        return url;
+    public String getDisUrl() {
+        return disUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDisUrl(String disUrl) {
+        this.disUrl = disUrl;
     }
 
     public String getUrlToImage() {

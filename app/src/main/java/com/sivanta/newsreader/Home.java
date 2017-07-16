@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.sivanta.newsreader.Network.UrlAdapter;
 import com.sivanta.newsreader.Network.UrlClass;
@@ -109,7 +108,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 bundle.putString("newsB",sB1);
                 Log.d("getValues",s1);
                 Log.d("getValuesB",sB1);
-                Toast.makeText(getApplication(),"ccn news",Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(getApplication(),"ccn news",Toast.LENGTH_SHORT).show();
                 break;
             case 2: sourcList.put("source",urlClass.getInti(position));
                 sourcListB.put("sourceB",urlClassB.getInti(position));
@@ -142,7 +141,7 @@ public class Home extends AppCompatActivity implements AdapterView.OnItemSelecte
                 bundle.putString("newsB",sB);
                 Log.d("getValues",s);
                 Log.d("getValuesB",sB);
-                Toast.makeText(getApplication(),"bbc news",Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getApplication(),"bbc news",Toast.LENGTH_SHORT).show();
                 break;
         }
         //  returnUrl(position);

@@ -1,14 +1,17 @@
 package com.sivanta.newsreader;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -55,14 +58,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder>
         }
        // Picasso.with(context).load(Uri.parse(articles.getUrlToImage())).into(holder.imv);
         holder.title.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(),"tittle has clicked",Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(v.getContext(),"tittle has clicked",Toast.LENGTH_SHORT).show();
                 Intent intent=new Intent(v.getContext(),ChildActivity.class);
                 intent.putExtra("title",articlesList.get(position).getTitle().toString());
                 intent.putExtra("urlToImage",articlesList.get(position).getUrlToImage().toString());
                 intent.putExtra("description",articlesList.get(position).getDescription().toString());
-                v.getContext().startActivity(intent);
+                intent.putExtra("disUrl",articlesList.get(position).getDisUrl().toString());
+                ActivityOptionsCompat option=ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) v.getContext(),holder.imv,holder.imv.getTransitionName());
+                v.getContext().startActivity(intent,option.toBundle());
 
 
             }

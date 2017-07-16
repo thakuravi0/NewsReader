@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -16,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sivanta.newsreader.Network.VolleySingleton;
+import com.sivanta.newsreader.util.NetworkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +33,7 @@ public class Fragment_B extends android.support.v4.app.Fragment
 {
     String TAG;
     String url;
+    ProgressBar progressBar;
 
     ArrayList<Model> modelArrayList;
   //  private String url="https://newsapi.org/v1/articles?source=the-times-of-india&sortBy=latest&apiKey=22a7f031ea4d463b82d6bfffac2ec47c";
@@ -43,6 +46,8 @@ public class Fragment_B extends android.support.v4.app.Fragment
         url=bundle.getString("newsB").toString();
 
         View view= inflater.inflate(R.layout.fragment_b,container,false);
+        progressBar= (ProgressBar) view.findViewById(R.id.progressBar);
+
         modelArrayList=new ArrayList<>();
 
         rlv= (RecyclerView) view.findViewById(R.id.rlv);
@@ -51,6 +56,11 @@ public class Fragment_B extends android.support.v4.app.Fragment
         DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(rlv.getContext(),
                                                                               linearLayoutManager.getOrientation());
         rlv.addItemDecoration(dividerItemDecoration);
+        rlv.setVisibility(View.GONE);
+        if (!NetworkUtil.getConnectivityStatus(getActivity()))
+        {
+            progressBar.setVisibility(View.GONE);
+        }
         RequestQueue requestQueue= VolleySingleton.getRequestQueue();
         Log.d("urllB",url);
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.GET,url, null, new Response.Listener<JSONObject>() {
@@ -77,6 +87,8 @@ public class Fragment_B extends android.support.v4.app.Fragment
                               }
                               NewsAdapter2 newsAdapter2=new NewsAdapter2(getActivity(),modelArrayList);
                               rlv.setAdapter(newsAdapter2);
+                              progressBar.setVisibility(View.GONE);
+                              rlv.setVisibility(View.VISIBLE);
                           }
 
 
@@ -87,6 +99,7 @@ public class Fragment_B extends android.support.v4.app.Fragment
                           }
                       });
         requestQueue.add(jsonObjectRequest);
+
       //  new GetNews().execute();
         return view;
     }

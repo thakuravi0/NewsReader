@@ -1,7 +1,9 @@
 package com.sivanta.newsreader;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,6 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.sivanta.newsreader.Network.VolleySingleton;
 import com.sivanta.newsreader.dto.Articles;
 import com.sivanta.newsreader.dto.News;
+import com.sivanta.newsreader.util.NetworkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +37,7 @@ import java.util.HashMap;
 public class Fragment_A extends android.support.v4.app.Fragment
 {
     News news;
+    ProgressBar progressBar;
     private String TAG ;
     private RecyclerView recyclerView;
     ArrayList<Articles> articlesArrayList;
@@ -46,9 +51,9 @@ public class Fragment_A extends android.support.v4.app.Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-        Bundle bundle=getArguments();
-        Log.d("arg",bundle.toString());
-        source=bundle.getString("news").toString();
+        Bundle bundle = getArguments();
+        Log.d("arg", bundle.toString());
+        source = bundle.getString("news").toString();
 
      /*   if (bundle!=null)
         {
@@ -56,64 +61,85 @@ public class Fragment_A extends android.support.v4.app.Fragment
 
             Log.d("gotit",source);
         } */
-       View view=  inflater.inflate(R.layout.fragment_a,container,false);
-        articlesArrayList=new ArrayList<>();
-        recyclerView= (RecyclerView) view.findViewById(R.id.rlv);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this.getActivity());
+        View view = inflater.inflate(R.layout.fragment_a, container, false);
+        progressBar= (ProgressBar) view.findViewById(R.id.progressBar);
+        articlesArrayList = new ArrayList<>();
+        recyclerView = (RecyclerView) view.findViewById(R.id.rlv);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 linearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setVisibility(View.GONE);
 
-      //
-       // new GetNews().execute();
+        //
+        // new GetNews().execute();
         // String s1=home.sourcList.get("source");
 
-     //  Log.d("valueatA", String.valueOf(s1));
-       // String uri = "https://newsapi.org/v1/articles?source="+source+"&sortBy=top&apiKey=22a7f031ea4d463b82d6bfffac2ec47c";
+        //  Log.d("valueatA", String.valueOf(s1));
+        // String uri = "https://newsapi.org/v1/articles?source="+source+"&sortBy=top&apiKey=22a7f031ea4d463b82d6bfffac2ec47c";
+        if (!NetworkUtil.getConnectivityStatus(getActivity())) {
+            progressBar.setVisibility(View.GONE);
+            AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
+            alertDialog.setTitle("Alert");
+            alertDialog.setMessage("You are offline!");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.show();
 
-        RequestQueue requestQueue= VolleySingleton.getInstance().getRequestQueue();
-        Log.d("urll",source);
-      // String ss= "https://newsapi.org/v1/articles?source=cnn-news&sortBy=top&apiKey=22a7f031ea4d463b82d6bfffac2ec47c";
 
-        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.GET,source,null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                 if(response.has("articles"))
-                 {
-                try {
-                    JSONArray articles=response.getJSONArray("articles");
-                    for (int i=0;i<articles.length();i++)
-                    {
-                        JSONObject jsonObject=articles.getJSONObject(i);
-                        String title=jsonObject.getString("title");
-                        String urlToImage=jsonObject.getString("urlToImage");
-                        String description=jsonObject.getString("description");
-                        articlesArrayList.add(new Articles(title,urlToImage,description));
+        }
+                   RequestQueue requestQueue = VolleySingleton.getInstance().getRequestQueue();
+            Log.d("urll", source);
+            // String ss= "https://newsapi.org/v1/articles?source=cnn-news&sortBy=top&apiKey=22a7f031ea4d463b82d6bfffac2ec47c";
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, source, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    if (response.has("articles")) {
+                        try {
+                            JSONArray articles = response.getJSONArray("articles");
+                            for (int i = 0; i < articles.length(); i++) {
+                                JSONObject jsonObject = articles.getJSONObject(i);
+                                String title = jsonObject.getString("title");
+                                String urlToImage = jsonObject.getString("urlToImage");
+                                String description = jsonObject.getString("description");
+                                String publishedAt=jsonObject.getString("publishedAt");
+                                String disUrl=jsonObject.getString("url");
+                                articlesArrayList.add(new Articles(title,urlToImage,description,disUrl));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.e(TAG, "Couldn't get json value from server.");
                     }
+                    NewsAdapter newsAdapter = new NewsAdapter(getActivity(), articlesArrayList);
+                    recyclerView.setAdapter(newsAdapter);
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }}
-                else {
-                     Log.e(TAG, "Couldn't get json value from server.");
-                 }
-                NewsAdapter newsAdapter =new NewsAdapter(getActivity(),articlesArrayList);
-                recyclerView.setAdapter(newsAdapter);
-            }
+
+                }
 
             }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-            }
+                }
 
-    }){
+            }) {
 
-        };
-        requestQueue.add(jsonObjectRequest);
-        return view;
-    }
+            };
+            requestQueue.add(jsonObjectRequest);
+
+            return view;
+        }
 
   /*  private class GetNews extends AsyncTask<Void,Void,Void>
     {
@@ -162,9 +188,6 @@ public class Fragment_A extends android.support.v4.app.Fragment
             recyclerView.setAdapter(newsAdapter);
         }
     }*/
-  public void display()
-  {
 
-  }
 }
 
